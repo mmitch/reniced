@@ -1,0 +1,174 @@
+#!/usr/bin/perl -w
+# $Id: reniced,v 1.1 2005-04-15 17:48:58 mitch Exp $
+
+
+### Global settings
+
+
+# default values for rulefile position
+my $rulefile_root = '/etc/reniced.conf';
+my $rulefile_user = '~/.reniced';
+# default debug value
+my $debug = 0;
+
+# see setpriority(2) and /usr/include/bits/resource.h
+my $PRIO_PROCESS = 0;
+
+# are we root?
+my $root = $> == 0;
+
+
+### Subroutines
+
+
+sub show_help()
+# print options
+{
+    print << 'EOF';
+Usage:
+   reniced [-h] [-v] [configfile]
+
+Configuration file format:
+   # is a comment
+   numeric_nicelevel perl_regular_expression
+
+Todo:
+   - get numeric value of PRIO_PROCESS in a proper way
+   - write a manpage (POD)
+
+Version:
+   $Id: reniced,v 1.1 2005-04-15 17:48:58 mitch Exp $
+EOF
+    ;
+}
+
+sub debug(@)
+# print debug messages
+{
+    print "@_\n" if $debug;
+}
+
+sub parse_options()
+# check if "-v" is given
+{
+    while (1) {
+	if ($ARGV[0] eq '-v') {
+	    shift @ARGV;
+	    $debug = 1;
+	    next;
+	}
+	if ($ARGV[0] eq '-h') {
+	    shift @ARGV;
+	    show_help();
+	    exit 0;
+	}
+	last;
+    }
+}
+
+sub find_rulefile()
+# find rulefile
+{
+    my $rulefile;
+
+    if ($root) {
+	$rulefile = $rulefile_root;
+    } else {
+	$rulefile = $rulefile_user;
+    }
+    if ($ARGV[0]) {
+	$rulefile = shift @ARGV;
+    }
+    $rulefile =~ s/^~/$ENV{HOME}/;
+
+    debug "rulefile: $rulefile";
+    return $rulefile;
+}
+
+sub read_rulefile()
+# read rules
+{
+    my $rulefile = find_rulefile();
+    my @rule;
+
+    open RULES, "<$rulefile" or die "can't open `$rulefile': $!";
+    while (my $line = <RULES>) {
+	chomp $line;
+	next if ($line =~ /^\s*$/);
+	next if ($line =~ /^#/);
+	if ($line =~ /\s*(-?\d+)\s+(.+)/) {
+	    push @rule, { REGEXP => $2, NICE => $1 };
+	} else {
+	    warn "rules line #$. skipped: `$line'\n";
+	}
+    }
+    close RULES or die "can't close `$rulefile': $!";
+    
+    debug scalar @rule . " rules read";
+    return \@rule;
+}
+
+sub generate_ps_command()
+# generate ps commandline
+{
+    my $cmdline = 'ps';
+
+    if ($root) {
+	$cmdline .= ' -A';
+    } else {
+	$cmdline .= " --user $>";
+    }
+
+    return $cmdline;
+}
+
+sub read_processes()
+# read processes
+{
+    my @proc;
+    my $cmdline = generate_ps_command();
+
+    open PS, "$cmdline|" or die "can't open `$cmdline': $!";
+    {
+	my $line = <PS>; # skip first line
+	while ($line = <PS>) {
+	    chomp $line;
+	    my $pid = substr($line, 0, 5 )+ 0;
+	    my $cmd = substr($line, 24 );
+	    push @proc, { PID => $pid, CMD => $cmd };
+	}
+    }
+    close PS or die "can't close `$cmdline': $!";
+
+    debug scalar @proc . " processes read";
+    return \@proc;
+}
+
+sub renice_processes($$)
+# renice
+{
+    my $rule = shift;
+    my $proc = shift;
+
+    foreach my $proc (@{$proc}) {
+	foreach my $rule (@{$rule}) {
+	    if ($proc->{CMD} =~ /$rule->{REGEXP}/) {
+		debug "renicing to $rule->{NICE}: $proc->{PID}/$proc->{CMD}";
+		setpriority $PRIO_PROCESS, $proc->{PID}, $rule->{NICE};
+		last;
+	    }
+	}
+    }
+}
+
+
+### Main program
+
+
+parse_options();
+my $rules = read_rulefile();
+exit unless @{$rules};
+my $procs = read_processes();
+exit unless @{$procs};
+renice_processes($rules, $procs);
+exit 0;
