@@ -1,5 +1,7 @@
 #!/usr/bin/perl -w
-# $Id: reniced,v 1.1 2005-04-15 17:48:58 mitch Exp $
+# $Id: reniced,v 1.2 2005-04-15 17:50:24 mitch Exp $
+# Licensed unter GNU GPL
+use strict;
 
 
 ### Global settings
@@ -37,7 +39,7 @@ Todo:
    - write a manpage (POD)
 
 Version:
-   $Id: reniced,v 1.1 2005-04-15 17:48:58 mitch Exp $
+   $Id: reniced,v 1.2 2005-04-15 17:50:24 mitch Exp $
 EOF
     ;
 }
@@ -51,7 +53,7 @@ sub debug(@)
 sub parse_options()
 # check if "-v" is given
 {
-    while (1) {
+    while (@ARGV) {
 	if ($ARGV[0] eq '-v') {
 	    shift @ARGV;
 	    $debug = 1;
