@@ -1,7 +1,7 @@
-# $Id: Makefile,v 1.2 2005-04-16 21:44:42 mitch Exp $
+# $Id: Makefile,v 1.3 2005-04-16 21:45:44 mitch Exp $
 
-VERSION=$(shell grep \$Id: reniced \
-	| head -n 1 | sed -e 's/^.*,v //' -e 's/ .*$//'
+VERSION=$(shell grep \$$Id: reniced \
+	| head -n 1 | sed -e 's/^.*,v //' -e 's/ .*$$//')
 
 DISTDIR=renice-$(VERSION)
 DISTFILE=$(DISTDIR).tar.gz
