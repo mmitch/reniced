@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# $Id: reniced,v 1.3 2005-04-16 21:12:29 mitch Exp $
+# $Id: reniced,v 1.4 2005-04-16 21:12:46 mitch Exp $
 # Licensed unter GNU GPL
 use strict;
 
@@ -34,11 +34,10 @@ Configuration file format:
    numeric_nicelevel perl_regular_expression
 
 Todo:
-   - get numeric value of PRIO_PROCESS in a proper way
    - write a manpage (POD)
 
 Version:
-   $Id: reniced,v 1.3 2005-04-16 21:12:29 mitch Exp $
+   $Id: reniced,v 1.4 2005-04-16 21:12:46 mitch Exp $
 EOF
     ;
 }
