@@ -1,9 +1,9 @@
-# $Id: Makefile,v 1.3 2005-04-16 21:45:44 mitch Exp $
+# $Id: Makefile,v 1.4 2005-04-16 21:48:35 mitch Exp $
 
 VERSION=$(shell grep \$$Id: reniced \
 	| head -n 1 | sed -e 's/^.*,v //' -e 's/ .*$$//')
 
-DISTDIR=renice-$(VERSION)
+DISTDIR=reniced-$(VERSION)
 DISTFILE=$(DISTDIR).tar.gz
 
 BINARY=reniced
