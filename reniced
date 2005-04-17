@@ -1,7 +1,100 @@
 #!/usr/bin/perl -w
-# $Id: reniced,v 1.4 2005-04-16 21:12:46 mitch Exp $
-# Licensed unter GNU GPL
+# $Id: reniced,v 1.5 2005-04-17 10:36:01 mitch Exp $
+#
+# reniced - renice running processes based on regular expressions
+#
+# 2005 (C) by Christian Garbs <mitch@cgarbs.de>
+# Licensed under GNU GPL.  See COPYING for details.
+
 use strict;
+
+=head1 NAME
+
+reniced - renice running processes based on regular expressions
+
+=head1 SYNOPSIS
+
+B<reniced>
+S<[B<-h>]>
+S<[B<-v>]>
+S<[I<configfile>]>
+
+=head1 OVERVIEW
+
+reniced takes a list of regular expressions, looks for processes
+matching them and renices the processes to given values.
+
+=head1 DESCRIPTION
+
+On start, reniced reads a configuration file.  It consists of nice
+values and regular expressions.
+
+It then scans the process table using `ps -A`.  Whenever a process
+name from the CMD column matches a regular expression, that process is
+reniced to the given value.  If a process matches multiple regular
+expressions, only the first one encountered is executed.
+
+When run as root, reniced will scan all processes.  When run as a
+user, renice only scans the user's processes.
+
+=head2 Switches
+
+=over 5
+
+=item B<-h>
+
+This prints the version number and a short help text.
+
+=item B<-v>
+
+This activates verbose mode.  Some statistics and all renice actions
+are printed to stdout.
+
+=item I<configfile>
+
+This reads the regular expressions from an alternate configfile.
+
+The default location of the configfile is /etc/reniced.conf if reniced
+is run as root, ~/.reniced otherwise.
+
+=back
+
+=head2 Configuration file format
+
+The configuration file is composed of single lines.  Empty lines and
+lines starting with a B<#> are ignored.
+
+Every line must consist of a decimal value (the nice value) followed
+by a whitespace and a Perl regular expression.
+
+=head1 MODULES NEEDED
+
+ use BSD::Resource;
+
+This module can be obtained from L<http://www.cpan.org>.
+
+=head1 BUGS
+
+reniced can run without the BSD::Resource module.  In this case, the
+PRIO_PROCESS is set to 0.  This works on Linux 2.6.11 i686 but it
+could break on other systems.  Installing BSD::Resource is the safer
+way.
+
+Please report bugs to <F<mitch@cgarbs.de>>.
+
+=head1 AUTHOT
+
+reniced was written by Christian Garbs <F<mitch@cgarbs.de>>.
+
+=head1 AVAILABILITY
+
+Look for updates ad L<http://www.cgarbs.de/stuff.en.html>.
+
+=head1 COPYRIGHT
+
+reniced is licensed under the GNU GPL
+
+=cut
 
 
 ### Global settings
@@ -29,15 +122,19 @@ sub show_help()
 Usage:
    reniced [-h] [-v] [configfile]
 
+Options:
+     -h           print help
+     -v           be verbose
+     configfile   read alternative configuration file
+                  default: /etc/reniced.conf for root
+                           ~/.reniced for others
+
 Configuration file format:
    # is a comment
    numeric_nicelevel perl_regular_expression
 
-Todo:
-   - write a manpage (POD)
-
 Version:
-   $Id: reniced,v 1.4 2005-04-16 21:12:46 mitch Exp $
+   $Id: reniced,v 1.5 2005-04-17 10:36:01 mitch Exp $
 EOF
     ;
 }
