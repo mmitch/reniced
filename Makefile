@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.4 2005-04-16 21:48:35 mitch Exp $
+# $Id: Makefile,v 1.5 2005-04-17 10:36:49 mitch Exp $
 
 VERSION=$(shell grep \$$Id: reniced \
 	| head -n 1 | sed -e 's/^.*,v //' -e 's/ .*$$//')
@@ -8,9 +8,9 @@ DISTFILE=$(DISTDIR).tar.gz
 
 BINARY=reniced
 CONFIG=reniced.conf
-MANPAGE=
+DOCUMENTS=COPYRIGHT
 
-FILES=$(BINARY) $(CONFIG) $(MANPAGE)
+FILES=$(BINARY) $(CONFIG) $(DOCUMENTS)
 
 all:	dist
 
