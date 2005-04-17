@@ -1,25 +1,36 @@
-# $Id: Makefile,v 1.5 2005-04-17 10:36:49 mitch Exp $
+# $Id: Makefile,v 1.6 2005-04-17 11:00:32 mitch Exp $
 
+PKGNAME=reniced
 VERSION=$(shell grep \$$Id: reniced \
 	| head -n 1 | sed -e 's/^.*,v //' -e 's/ .*$$//')
 
-DISTDIR=reniced-$(VERSION)
+DISTDIR=$(PKGNAME)-$(VERSION)
 DISTFILE=$(DISTDIR).tar.gz
 
-BINARY=reniced
+BINARIES=reniced
 CONFIG=reniced.conf
 DOCUMENTS=COPYRIGHT
 
-FILES=$(BINARY) $(CONFIG) $(DOCUMENTS)
+FILES=$(BINARIES) $(CONFIG) $(DOCUMENTS)
+
+MANDIR=./manpages
+POD2MANOPTS=--release=$(VERSION) --center=$(PKGNAME) --section=1
 
 all:	dist
 
 clean:
-	-rm -f *~
+	rm -f *~
+	rm -rf $(MANDIR)
 
-dist:	clean
-	-rm -rf $(DISTDIR)
+generate-manpages:
+	rm -rf $(MANDIR)
+	mkdir $(MANDIR)
+	for FILE in $(BINARIES); do pod2man $(POD2MANOPTS) $$FILE $(MANDIR)/$$FILE.1; done
+
+dist:	clean generate-manpages
+	rm -rf $(DISTDIR)
 	mkdir $(DISTDIR)
 	cp $(FILES) $(DISTDIR)
+	cp $(MANDIR)/* $(DISTDIR)
 	tar -c $(DISTDIR) -zvf $(DISTFILE)
 	rm -rf $(DISTDIR)
