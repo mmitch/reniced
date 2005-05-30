@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.6 2005-04-17 11:00:32 mitch Exp $
+# $Id: Makefile,v 1.7 2005-05-30 18:30:38 mitch Exp $
 
 PKGNAME=reniced
 VERSION=$(shell grep \$$Id: reniced \
@@ -32,5 +32,5 @@ dist:	clean generate-manpages
 	mkdir $(DISTDIR)
 	cp $(FILES) $(DISTDIR)
 	cp $(MANDIR)/* $(DISTDIR)
-	tar -c $(DISTDIR) -zvf $(DISTFILE)
+	tar -czvf $(DISTFILE) $(DISTDIR)
 	rm -rf $(DISTDIR)
