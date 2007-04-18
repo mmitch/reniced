@@ -1,9 +1,9 @@
 #!/usr/bin/perl -w
-# $Id: reniced,v 1.5 2005-04-17 10:36:01 mitch Exp $
+# $Id: reniced,v 1.6 2007-04-18 16:49:15 mitch Exp $
 #
 # reniced - renice running processes based on regular expressions
 #
-# 2005 (C) by Christian Garbs <mitch@cgarbs.de>
+# 2005,2007 (C) by Christian Garbs <mitch@cgarbs.de>
 # Licensed under GNU GPL.  See COPYING for details.
 
 use strict;
@@ -134,7 +134,7 @@ Configuration file format:
    numeric_nicelevel perl_regular_expression
 
 Version:
-   $Id: reniced,v 1.5 2005-04-17 10:36:01 mitch Exp $
+   $Id: reniced,v 1.6 2007-04-18 16:49:15 mitch Exp $
 EOF
     ;
 }
@@ -151,13 +151,14 @@ sub get_prio_process()
     # Check for BSD::Resource which has the constant
     eval { require BSD::Resource; };
     if (not $@) {
-	$PRIO_PROCESS = $PRIO_PROCESS;
-	debug "PRIO_PROCESS set via BSD::Resource";
+	eval { use BSD::Resource qw(PRIO_PROCESS); };
+	$PRIO_PROCESS = PRIO_PROCESS;
+	debug "PRIO_PROCESS set to $PRIO_PROCESS via BSD::Resource";
     } else {
 	# dirty fallback, works for my Linux 2.6.11 i686 GNU/Linux
 	# see setpriority(2) and /usr/include/bits/resource.h
 	$PRIO_PROCESS = 0;
-	debug "PRIO_PROCESS fallback";
+	debug "PRIO_PROCESS to $PRIO_PROCESS via fallback";
     }
 }
 
