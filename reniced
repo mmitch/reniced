@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# $Id: reniced,v 1.6 2007-04-18 16:49:15 mitch Exp $
+# $Id: reniced,v 1.7 2007-04-18 17:16:12 mitch Exp $
 #
 # reniced - renice running processes based on regular expressions
 #
@@ -36,6 +36,9 @@ expressions, only the first one encountered is executed.
 
 When run as root, reniced will scan all processes.  When run as a
 user, renice only scans the user's processes.
+
+TODO: XXX describe what happens when multiple matches are found.
+          before: first one wins, now last one wins (nice/ionice crossovers!)
 
 =head2 Switches
 
@@ -82,7 +85,7 @@ way.
 
 Please report bugs to <F<mitch@cgarbs.de>>.
 
-=head1 AUTHOT
+=head1 AUTHOR
 
 reniced was written by Christian Garbs <F<mitch@cgarbs.de>>.
 
@@ -110,6 +113,10 @@ my $debug = 0;
 my $root = $> == 0;
 # a dynamically calculated constant :-)
 my $PRIO_PROCESS;
+#
+my %SCHEDULING_CLASS = ( 1 => 'realtime',
+			 2 => 'best-effort',
+			 3 => 'idle' );
 
 
 ### Subroutines
@@ -134,7 +141,7 @@ Configuration file format:
    numeric_nicelevel perl_regular_expression
 
 Version:
-   $Id: reniced,v 1.6 2007-04-18 16:49:15 mitch Exp $
+   $Id: reniced,v 1.7 2007-04-18 17:16:12 mitch Exp $
 EOF
     ;
 }
@@ -210,8 +217,23 @@ sub read_rulefile()
 	chomp $line;
 	next if ($line =~ /^\s*$/);
 	next if ($line =~ /^#/);
-	if ($line =~ /\s*(-?\d+)\s+(.+)/) {
-	    push @rule, { REGEXP => $2, NICE => $1 };
+	if ($line =~ /\s*(-?\d+?[rbi]?[0-7]?)\s+(.+)/) {
+	    my $command = $1;
+	    my $rule = { REGEXP => $2 };
+	    if ($command =~ s/^(-?\d+)//) {
+		$rule->{NICE} = $1;
+	    }
+	    $rule->{IOCLASS} = 1 if $command =~ s/^r//;
+	    $rule->{IOCLASS} = 2 if $command =~ s/^b//;
+	    $rule->{IOCLASS} = 3 if $command =~ s/^i//;
+	    if ($command =~ /^[0-7]$/) {
+		$rule->{IONICE} = $command;
+	    }
+	    if (scalar keys %{$rule} > 1) {
+		push @rule, $rule;
+	    } else {
+		warn "rule line #$. skipped: `$line'\n";
+	    }
 	} else {
 	    warn "rules line #$. skipped: `$line'\n";
 	}
@@ -267,9 +289,19 @@ sub renice_processes($$)
     foreach my $proc (@{$procs}) {
 	foreach my $rule (@{$rules}) {
 	    if ($proc->{CMD} =~ /$rule->{REGEXP}/) {
-		debug "renicing to $rule->{NICE}: $proc->{PID}/$proc->{CMD}";
-		setpriority $PRIO_PROCESS, $proc->{PID}, $rule->{NICE};
-		last;
+		if (exists $rule->{NICE}) {
+		    debug "nice set to $rule->{NICE}: $proc->{PID}/$proc->{CMD}";
+		    setpriority $PRIO_PROCESS, $proc->{PID}, $rule->{NICE};
+		}
+		if (exists $rule->{IOCLASS}) {
+		    if (exists $rule->{IONICE}) {
+			debug "ionice set to $SCHEDULING_CLASS{$rule->{IOCLASS}}, class $rule->{IONICE}: $proc->{PID}/$proc->{CMD}";
+			`ionice -n $rule->{IONICE} -c $rule->{IOCLASS} -p $proc->{PID}`;
+		    } else {
+			debug "ionice set to $SCHEDULING_CLASS{$rule->{IOCLASS}}: $proc->{PID}/$proc->{CMD}";
+			`ionice -c $rule->{IOCLASS} -p $proc->{PID}`;
+		    }
+		}
 	    }
 	}
     }
