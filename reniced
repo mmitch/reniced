@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# $Id: reniced,v 1.9 2007-04-18 17:26:43 mitch Exp $
+# $Id: reniced,v 1.10 2007-04-18 17:47:08 mitch Exp $
 #
 # reniced - renice running processes based on regular expressions
 #
@@ -141,7 +141,7 @@ Configuration file format:
    numeric_nicelevel perl_regular_expression
 
 Version:
-   $Id: reniced,v 1.9 2007-04-18 17:26:43 mitch Exp $
+   $Id: reniced,v 1.10 2007-04-18 17:47:08 mitch Exp $
 EOF
     ;
 }
@@ -219,7 +219,7 @@ sub read_rulefile()
 	chomp $line;
 	next if ($line =~ /^\s*$/);
 	next if ($line =~ /^#/);
-	if ($line =~ /\s*(-?\d+?[rbi]?[0-7]?)\s+(.+)/) {
+	if ($line =~ /^\s*(-?\d*[rbi]?[0-7]?)\s+(.+)/) {
 	    my $command = $1;
 	    my $rule = { REGEXP => $2 };
 	    if ($command =~ s/^(-?\d+)//) {
