@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# $Id: reniced,v 1.7 2007-04-18 17:16:12 mitch Exp $
+# $Id: reniced,v 1.8 2007-04-18 17:21:19 mitch Exp $
 #
 # reniced - renice running processes based on regular expressions
 #
@@ -141,7 +141,7 @@ Configuration file format:
    numeric_nicelevel perl_regular_expression
 
 Version:
-   $Id: reniced,v 1.7 2007-04-18 17:16:12 mitch Exp $
+   $Id: reniced,v 1.8 2007-04-18 17:21:19 mitch Exp $
 EOF
     ;
 }
@@ -149,7 +149,9 @@ EOF
 sub debug(@)
 # print debug messages
 {
-    print "@_\n" if $debug;
+    return unless $debug;
+    my $format = shift @_;
+    printf "$format\n", @_;
 }
 
 sub get_prio_process()
@@ -160,12 +162,12 @@ sub get_prio_process()
     if (not $@) {
 	eval { use BSD::Resource qw(PRIO_PROCESS); };
 	$PRIO_PROCESS = PRIO_PROCESS;
-	debug "PRIO_PROCESS set to $PRIO_PROCESS via BSD::Resource";
+	debug 'PRIO_PROCESS set to %d via BSD::Resource', $PRIO_PROCESS;
     } else {
 	# dirty fallback, works for my Linux 2.6.11 i686 GNU/Linux
 	# see setpriority(2) and /usr/include/bits/resource.h
 	$PRIO_PROCESS = 0;
-	debug "PRIO_PROCESS to $PRIO_PROCESS via fallback";
+	debug 'PRIO_PROCESS to %d via fallback', $PRIO_PROCESS;
     }
 }
 
@@ -202,7 +204,7 @@ sub find_rulefile()
     }
     $rulefile =~ s/^~/$ENV{HOME}/;
 
-    debug "rulefile: $rulefile";
+    debug 'rulefile: %s', $rulefile;
     return $rulefile;
 }
 
@@ -240,7 +242,7 @@ sub read_rulefile()
     }
     close RULES or die "can't close `$rulefile': $!";
     
-    debug scalar @rule . " rules read";
+    debug '%d rules read', scalar @rule;
     return \@rule;
 }
 
@@ -276,7 +278,7 @@ sub read_processes()
     }
     close PS or die "can't close `$cmdline': $!";
 
-    debug scalar @proc . " processes read";
+    debug '%d processes read', scalar @proc;
     return \@proc;
 }
 
@@ -290,15 +292,18 @@ sub renice_processes($$)
 	foreach my $rule (@{$rules}) {
 	    if ($proc->{CMD} =~ /$rule->{REGEXP}/) {
 		if (exists $rule->{NICE}) {
-		    debug "nice set to $rule->{NICE}: $proc->{PID}/$proc->{CMD}";
+		    debug 'nice set to %d: %d/%s'
+			, $rule->{NICE}, $proc->{PID}, $proc->{CMD};
 		    setpriority $PRIO_PROCESS, $proc->{PID}, $rule->{NICE};
 		}
 		if (exists $rule->{IOCLASS}) {
 		    if (exists $rule->{IONICE}) {
-			debug "ionice set to $SCHEDULING_CLASS{$rule->{IOCLASS}}, class $rule->{IONICE}: $proc->{PID}/$proc->{CMD}";
+			debug 'ionice set to %s, class %d: %d/%s'
+			    , $SCHEDULING_CLASS{$rule->{IOCLASS}}, $rule->{IONICE}, $proc->{PID}, $proc->{CMD};
 			`ionice -n $rule->{IONICE} -c $rule->{IOCLASS} -p $proc->{PID}`;
 		    } else {
-			debug "ionice set to $SCHEDULING_CLASS{$rule->{IOCLASS}}: $proc->{PID}/$proc->{CMD}";
+			debug 'ionice set to %s: %d/%s'
+			    , $SCHEDULING_CLASS{$rule->{IOCLASS}}, $proc->{PID}, $proc->{CMD};
 			`ionice -c $rule->{IOCLASS} -p $proc->{PID}`;
 		    }
 		}
