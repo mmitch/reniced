@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# $Id: reniced,v 1.10 2007-04-18 17:47:08 mitch Exp $
+# $Id: reniced,v 1.11 2007-04-20 19:02:10 mitch Exp $
 #
 # reniced - renice running processes based on regular expressions
 #
@@ -141,7 +141,7 @@ Configuration file format:
    numeric_nicelevel perl_regular_expression
 
 Version:
-   $Id: reniced,v 1.10 2007-04-18 17:47:08 mitch Exp $
+   $Id: reniced,v 1.11 2007-04-20 19:02:10 mitch Exp $
 EOF
     ;
 }
@@ -292,19 +292,19 @@ sub renice_processes($$)
 	foreach my $rule (@{$rules}) {
 	    if ($proc->{CMD} =~ /$rule->{REGEXP}/) {
 		if (exists $rule->{NICE}) {
-		    debug 'nice set to %d: %d/%s'
-			, $rule->{NICE}, $proc->{PID}, $proc->{CMD};
-		    setpriority $PRIO_PROCESS, $proc->{PID}, $rule->{NICE};
+		    my $success = setpriority $PRIO_PROCESS, $proc->{PID}, $rule->{NICE};
+		    debug '%snice set to %d: %d/%s'
+			, $success ? '' : 'FAILED: ', $rule->{NICE}, $proc->{PID}, $proc->{CMD};
 		}
 		if (exists $rule->{IOCLASS}) {
 		    if (exists $rule->{IONICE}) {
-			debug 'ionice set to %s, class %d: %d/%s'
-			    , $SCHEDULING_CLASS{$rule->{IOCLASS}}, $rule->{IONICE}, $proc->{PID}, $proc->{CMD};
-			`ionice -n $rule->{IONICE} -c $rule->{IOCLASS} -p $proc->{PID}`;
+			my $success = system 'ionice', '-c', $rule->{IOCLASS}, '-p', $proc->{PID}, '-n', $rule->{IONICE};
+			debug '%sionice set to %s, class %d: %d/%s'
+			    , $success ? 'FAILED: ' : '', $SCHEDULING_CLASS{$rule->{IOCLASS}}, $rule->{IONICE}, $proc->{PID}, $proc->{CMD};
 		    } else {
-			debug 'ionice set to %s: %d/%s'
-			    , $SCHEDULING_CLASS{$rule->{IOCLASS}}, $proc->{PID}, $proc->{CMD};
-			`ionice -c $rule->{IOCLASS} -p $proc->{PID}`;
+			my $success = system 'ionce', '-c', $rule->{IOCLASS}, '-p', $proc->{PID};
+			debug '%sionice set to %s: %d/%s'
+			    , $success ? 'FAILED: ' : '', $SCHEDULING_CLASS{$rule->{IOCLASS}}, $proc->{PID}, $proc->{CMD};
 		    }
 		}
 	    }
