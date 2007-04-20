@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# $Id: reniced,v 1.12 2007-04-20 19:42:53 mitch Exp $
+# $Id: reniced,v 1.13 2007-04-20 20:35:25 mitch Exp $
 #
 # reniced - renice running processes based on regular expressions
 #
@@ -181,7 +181,7 @@ Configuration file format:
    numeric_nicelevel perl_regular_expression
 
 Version:
-   $Id: reniced,v 1.12 2007-04-20 19:42:53 mitch Exp $
+   $Id: reniced,v 1.13 2007-04-20 20:35:25 mitch Exp $
 EOF
     ;
 }
@@ -342,7 +342,7 @@ sub renice_processes($$)
 			debug '%sionice set to %s, class %d: %d/%s'
 			    , $success ? 'FAILED: ' : '', $SCHEDULING_CLASS{$rule->{IOCLASS}}, $rule->{IONICE}, $proc->{PID}, $proc->{CMD};
 		    } else {
-			my $success = system 'ionce', '-c', $rule->{IOCLASS}, '-p', $proc->{PID};
+			my $success = system 'ionice', '-c', $rule->{IOCLASS}, '-p', $proc->{PID};
 			debug '%sionice set to %s: %d/%s'
 			    , $success ? 'FAILED: ' : '', $SCHEDULING_CLASS{$rule->{IOCLASS}}, $proc->{PID}, $proc->{CMD};
 		    }
