@@ -1,4 +1,4 @@
-# $Id: Makefile,v 1.7 2005-05-30 18:30:38 mitch Exp $
+# $Id: Makefile,v 1.8 2007-08-01 20:16:07 mitch Exp $
 
 PKGNAME=reniced
 VERSION=$(shell grep \$$Id: reniced \
@@ -9,7 +9,7 @@ DISTFILE=$(DISTDIR).tar.gz
 
 BINARIES=reniced
 CONFIG=reniced.conf
-DOCUMENTS=COPYRIGHT
+DOCUMENTS=COPYRIGHT HISTORY
 
 FILES=$(BINARIES) $(CONFIG) $(DOCUMENTS)
 
