@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# $Id: reniced,v 1.13 2007-04-20 20:35:25 mitch Exp $
+# $Id: reniced,v 1.14 2007-08-01 17:41:21 mitch Exp $
 #
 # reniced - renice running processes based on regular expressions
 #
@@ -181,7 +181,7 @@ Configuration file format:
    numeric_nicelevel perl_regular_expression
 
 Version:
-   $Id: reniced,v 1.13 2007-04-20 20:35:25 mitch Exp $
+   $Id: reniced,v 1.14 2007-08-01 17:41:21 mitch Exp $
 EOF
     ;
 }
@@ -292,9 +292,9 @@ sub generate_ps_command()
     my $cmdline = 'ps';
 
     if ($root) {
-	$cmdline .= ' -A';
+	$cmdline .= ' H -eo lwp,comm';
     } else {
-	$cmdline .= " --user $>";
+	$cmdline .= " H -o lwp,comm --user $>";
     }
 
     return $cmdline;
@@ -312,7 +312,7 @@ sub read_processes()
 	while ($line = <PS>) {
 	    chomp $line;
 	    my $pid = substr($line, 0, 5 )+ 0;
-	    my $cmd = substr($line, 24 );
+	    my $cmd = substr($line, 6 );
 	    push @proc, { PID => $pid, CMD => $cmd };
 	}
     }
