@@ -1,0 +1,19 @@
+$Id: HISTORY,v 1.1 2007-08-01 20:15:23 mitch Exp $
+
+----------------------------
+2007-08-01  revision 1.15
+
+ - include patch from Mario Galanti <mario_galanti@yahoo.it> to match
+   threads as well, not only processes
+ - add HISTORY
+
+----------------------------
+2007-04-20  revision 1.13
+
+ - enable setting of io priorities through ionice
+ - fix PRIO_PROCESS inquiry (pure luck that this has worked so far)
+
+----------------------------
+2005-04-17  revision 1.5
+
+ - initial release
