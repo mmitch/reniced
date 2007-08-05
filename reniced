@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# $Id: reniced,v 1.16 2007-08-05 11:32:43 mitch Exp $
+# $Id: reniced,v 1.17 2007-08-05 12:19:52 mitch Exp $
 #
 # reniced - renice running processes based on regular expressions
 #
@@ -30,14 +30,14 @@ reniced can also change io priorities.
 On start, reniced reads a configuration file.  It consists of nice
 values and regular expressions.
 
-It then scans the process table using `ps -A`.  Whenever a process
-name from the CMD column matches a regular expression, that process is
-reniced to the given value.  If a process matches multiple regular
-expressions, all rule matches are executed in order and the last match
-wins.
+It then scans the process table using the L<ps(1)> command.
+Whenever a process name from the CMD column matches a regular
+expression, that process is reniced to the given value.  If a process
+matches multiple regular expressions, all rule matches are executed in
+order and the last match wins.
 
-When run as root, reniced will scan all processes.  When run as a
-user, renice only scans the user's processes.
+When run as root, reniced will scan all processes (C<`ps H -e`>).
+When run as a user, renice only scans the user's processes (C<`ps H --user`>).
 
 =head2 Switches
 
@@ -56,8 +56,8 @@ renice actions are printed to stdout.
 
 This reads the regular expressions from an alternate configfile.
 
-The default location of the configfile is /etc/reniced.conf if reniced
-is run as root, ~/.reniced otherwise.
+The default location of the configfile is C</etc/reniced.conf> if reniced
+is run as root, C<~/.reniced> otherwise.
 
 =back
 
@@ -190,7 +190,7 @@ Command format:
    -10r4  set nice value to -10 and io priority to realtime class 4
 
 Version:
-   $Id: reniced,v 1.16 2007-08-05 11:32:43 mitch Exp $
+   $Id: reniced,v 1.17 2007-08-05 12:19:52 mitch Exp $
 EOF
     ;
 }
