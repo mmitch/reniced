@@ -1,5 +1,5 @@
 #!/usr/bin/perl -w
-# $Id: reniced,v 1.15 2007-08-01 19:54:56 mitch Exp $
+# $Id: reniced,v 1.16 2007-08-05 11:32:43 mitch Exp $
 #
 # reniced - renice running processes based on regular expressions
 #
@@ -181,10 +181,16 @@ Options:
 
 Configuration file format:
    # is a comment
-   numeric_nicelevel perl_regular_expression
+   command perl_regular_expression
+
+Command format:
+   5      set nice value to 5
+   b2     set io priority to best effort class 2
+   i      set io priority to idle
+   -10r4  set nice value to -10 and io priority to realtime class 4
 
 Version:
-   $Id: reniced,v 1.15 2007-08-01 19:54:56 mitch Exp $
+   $Id: reniced,v 1.16 2007-08-05 11:32:43 mitch Exp $
 EOF
     ;
 }
