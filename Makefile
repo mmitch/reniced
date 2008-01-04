@@ -1,5 +1,3 @@
-# $Id: Makefile,v 1.8 2007-08-01 20:16:07 mitch Exp $
-
 PKGNAME=reniced
 VERSION=$(shell grep \$$Id: reniced \
 	| head -n 1 | sed -e 's/^.*,v //' -e 's/ .*$$//')

@@ -1,5 +1,4 @@
 #!/usr/bin/perl -w
-# $Id: reniced,v 1.17 2007-08-05 12:19:52 mitch Exp $
 #
 # reniced - renice running processes based on regular expressions
 #
