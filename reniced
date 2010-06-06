@@ -233,7 +233,7 @@ sub parse_options()
 	    if (@ARGV) {
 		$psformat = shift @ARGV;
 	    } else {
-		die "-o is missing the format parameter";
+		die "-o is missing the format parameter\n";
 	    }
 	    next;
 	}
@@ -276,7 +276,7 @@ sub read_rulefile()
     my $rulefile = find_rulefile();
     my @rule;
 
-    open RULES, "<$rulefile" or die "can't open `$rulefile': $!";
+    open RULES, "<$rulefile" or die "can't open `$rulefile': $!\n";
     while (my $line = <RULES>) {
 	chomp $line;
 	next if ($line =~ /^\s*$/);
@@ -302,7 +302,7 @@ sub read_rulefile()
 	    warn "rules line #$. skipped: `$line'\n";
 	}
     }
-    close RULES or die "can't close `$rulefile': $!";
+    close RULES or die "can't close `$rulefile': $!\n";
     
     debug '%d rules read', scalar @rule;
     return \@rule;
@@ -329,7 +329,7 @@ sub read_processes()
     my @proc;
     my $cmdline = generate_ps_command();
 
-    open PS, "$cmdline|" or die "can't open `$cmdline': $!";
+    open PS, "$cmdline|" or die "can't open `$cmdline': $!\n";
     {
 	my $line = <PS>; # skip first line
 	while ($line = <PS>) {
@@ -339,7 +339,7 @@ sub read_processes()
 	    push @proc, { PID => $pid, CMD => $cmd };
 	}
     }
-    close PS or die "can't close `$cmdline': $!";
+    close PS or die "can't close `$cmdline': $!\n";
 
     debug '%d processes read', scalar @proc;
     return \@proc;
