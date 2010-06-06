@@ -194,7 +194,7 @@ Command format:
    -10r4  set nice value to -10 and io priority to realtime class 4
 
 Version:
-   $Id: reniced,v 1.17 2007-08-05 12:19:52 mitch Exp $
+   reniced 1.18
 EOF
     ;
 }

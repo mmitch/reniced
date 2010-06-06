@@ -1,6 +1,11 @@
 reniced HISTORY
 
 ----------------------------
+2010-06-06  revision 1.18
+
+ - add -o parameter to change ps(1) format to filter on
+
+----------------------------
 2007-08-05  revision 1.17
 
  - documentation updates

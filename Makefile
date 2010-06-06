@@ -1,6 +1,6 @@
 PKGNAME=reniced
-VERSION=$(shell grep \$$Id: reniced \
-	| head -n 1 | sed -e 's/^.*,v //' -e 's/ .*$$//')
+VERSION=$(shell grep 'reniced [0-9]' reniced \
+	| head -n 1 | sed -e 's/^\s*reniced\s*//' -e 's/\s*$$//')
 
 DISTDIR=$(PKGNAME)-$(VERSION)
 DISTFILE=$(DISTDIR).tar.gz
