@@ -95,6 +95,8 @@ sets currently running torrent-like applications to io priority idle
 gives currently running seti-processes a nice value of -10 and sets
 them to realtime io priority in class 4
 
+=back
+
 =head1 MODULES NEEDED
 
  use BSD::Resource;
