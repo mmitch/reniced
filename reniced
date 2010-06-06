@@ -2,7 +2,7 @@
 #
 # reniced - renice running processes based on regular expressions
 #
-# 2005,2007 (C) by Christian Garbs <mitch@cgarbs.de>
+# Copyright (C) 2005,2007,2010  Christian Garbs <mitch@cgarbs.de>
 # Licensed under GNU GPL.  See COPYING for details.
 
 use strict;
@@ -150,6 +150,8 @@ my $rulefile_root = '/etc/reniced.conf';
 my $rulefile_user = '~/.reniced';
 # default debug value
 my $debug = 0;
+# default ps output format
+my $psformat = 'comm';
 
 # are we root?
 my $root = $> == 0;
@@ -169,11 +171,14 @@ sub show_help()
 {
     print << 'EOF';
 Usage:
-   reniced [-h] [-v] [configfile]
+   reniced [-h] [-v] [-o format] [configfile]
 
 Options:
      -h           print help
      -v           be verbose
+     -o format    output format to filter on
+                  see ps(1) manpage for details
+                  default: comm
      configfile   read alternative configuration file
                   default: /etc/reniced.conf for root
                            ~/.reniced for others
@@ -223,6 +228,15 @@ sub parse_options()
 # check if "-v" is given
 {
     while (@ARGV) {
+	if ($ARGV[0] eq '-o') {
+	    shift @ARGV;
+	    if (@ARGV) {
+		$psformat = shift @ARGV;
+	    } else {
+		die "-o is missing the format parameter";
+	    }
+	    next;
+	}
 	if ($ARGV[0] eq '-v') {
 	    shift @ARGV;
 	    $debug = 1;
@@ -300,11 +314,12 @@ sub generate_ps_command()
     my $cmdline = 'ps';
 
     if ($root) {
-	$cmdline .= ' H -eo lwp,comm';
+	$cmdline .= " H -eo lwp,$psformat";
     } else {
-	$cmdline .= " H -o lwp,comm --user $>";
+	$cmdline .= " H -o lwp,$psformat --user $>";
     }
 
+    debug 'ps commandline is: %s', $cmdline;
     return $cmdline;
 }
 
