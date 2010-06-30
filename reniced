@@ -194,9 +194,10 @@ Command format:
    b2     set io priority to best effort class 2
    i      set io priority to idle
    -10r4  set nice value to -10 and io priority to realtime class 4
+   o-10   set OOM value /proc/$PID/oom_adj to -10
 
 Version:
-   reniced 1.18
+   reniced 1.18+oom
 EOF
     ;
 }
@@ -283,17 +284,35 @@ sub read_rulefile()
 	chomp $line;
 	next if ($line =~ /^\s*$/);
 	next if ($line =~ /^#/);
-	if ($line =~ /^\s*(-?\d*[rbi]?[0-7]?)\s+(.+)/) {
+	if ($line =~ /^\s*((?:[orbi]?-?\d*)+)\s+(.+)/) {
 	    my $command = $1;
 	    my $rule = { REGEXP => $2 };
-	    if ($command =~ s/^(-?\d+)//) {
+
+	    # nice value at start
+	    while ($command =~ s/^(-?\d+)//) {
 		$rule->{NICE} = $1;
 	    }
-	    $rule->{IOCLASS} = 1 if $command =~ s/^r//;
-	    $rule->{IOCLASS} = 2 if $command =~ s/^b//;
-	    $rule->{IOCLASS} = 3 if $command =~ s/^i//;
-	    if ($command =~ /^[0-7]$/) {
-		$rule->{IONICE} = $command;
+
+	    # OOM value starts with o
+	    while ($command =~ s/o(-?\d+)//) {
+		$rule->{OOMADJ}  = $1;
+	    }
+
+	    # ionice values start with [rbi]
+	    while ($command =~ s/([rbi])(\d+)?//) {
+		if ($1 eq 'r') {
+		    $rule->{IOCLASS} = 1;
+		} elsif ($1 eq 'b') {
+		    $rule->{IOCLASS} = 2;
+		} elsif ($1 eq 'i') {
+		    $rule->{IOCLASS} = 3;
+		} else {
+		    warn "rule line #$.: error during IOnice parsing: 1=`$1' 2=`$2' all=`$line'";
+		}
+
+		if (defined $2) {
+		    $rule->{IONICE} = $2;
+		}
 	    }
 	    if (scalar keys %{$rule} > 1) {
 		push @rule, $rule;
@@ -356,11 +375,29 @@ sub renice_processes($$)
     foreach my $proc (@{$procs}) {
 	foreach my $rule (@{$rules}) {
 	    if ($proc->{CMD} =~ /$rule->{REGEXP}/) {
+
+		# nice
 		if (exists $rule->{NICE}) {
 		    my $success = setpriority $PRIO_PROCESS, $proc->{PID}, $rule->{NICE};
 		    debug '%snice set to %d: %d/%s'
 			, $success ? '' : 'FAILED: ', $rule->{NICE}, $proc->{PID}, $proc->{CMD};
 		}
+
+		# OOM adjust
+		if (exists $rule->{OOMADJ}) {
+		    my $procfile = '/proc/'.$proc->{PID}.'/oom_adj';
+		    my $success = 1;
+		    if ( open (PROC, '>', $procfile) ) {
+			print PROC $rule->{OOMADJ}."\n";
+			close PROC or $success = 0;
+		    } else {
+			$success = 0;
+		    }
+		    debug '%sOOM adjust set to %d: %d/%s'
+			, $success ? '' : "FAILED ($!): ", $rule->{OOMADJ}, $proc->{PID}, $proc->{CMD};
+		}
+
+		# IO nice
 		if (exists $rule->{IOCLASS}) {
 		    if (exists $rule->{IONICE}) {
 			my $success = system 'ionice', '-c', $rule->{IOCLASS}, '-p', $proc->{PID}, '-n', $rule->{IONICE};
