@@ -16,6 +16,7 @@ reniced - renice running processes based on regular expressions
 B<reniced>
 S<[B<-h>]>
 S<[B<-v>]>
+S<[B<-o> I<format>]>
 S<[I<configfile>]>
 
 =head1 OVERVIEW
@@ -44,12 +45,18 @@ When run as a user, renice only scans the user's processes (C<`ps H --user`>).
 
 =item B<-h>
 
-This prints the version number and a short help text.
+This prints the version number, a short help text and exits without
+doing anything.
 
 =item B<-v>
 
 This activates verbose mode.  Error messages, some statistics and all
 renice actions are printed to stdout.
+
+=item B<-o> I<format>
+
+Set the L<ps(1)> output format to filter on.  The default format is
+C<comm>.  See the B<-o> parameter in the L<ps(1)> manpage for details.
 
 =item I<configfile>
 
@@ -105,6 +112,7 @@ This module can be obtained from L<http://www.cpan.org>.
 
 =head1 PROGRAMS NEEDED
 
+ ps
  ionice
 
 ionice is only needed if you want to change io priority.  It can be
@@ -139,7 +147,7 @@ Look for updates ad L<http://www.cgarbs.de/stuff.en.html>.
 
 =head1 SEE ALSO
 
-L<ionice(1)>, L<renice(1)>
+L<ionice(1)>, L<renice(1)>, L<ps(1)>
 
 =cut
 
