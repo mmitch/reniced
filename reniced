@@ -68,7 +68,7 @@ lines starting with a B<#> are ignored.
 Every line must consist of a command followed by a whitespace and a
 Perl regular expression.
 
-The command consists of a nice value, an io prority or both.  A nice
+The command consists of a nice value, an io priority or both.  A nice
 value is given as a decimal, usually within the range of -20 to 19.
 An io priority consists of the scheduling class (B<r> for realtime,
 B<b> for best-effort and B<i> for idle) optionally followed by the
