@@ -284,12 +284,15 @@ sub read_rulefile()
 	chomp $line;
 	next if ($line =~ /^\s*$/);
 	next if ($line =~ /^#/);
-	if ($line =~ /^\s*((?:[orbi]?-?\d*)+)\s+(.+)/) {
+	if ($line =~ /^\s*((?:[norbi]?-?\d*)+)\s+(.+)/) {
 	    my $command = $1;
 	    my $rule = { REGEXP => $2 };
 
-	    # nice value at start
-	    while ($command =~ s/^(-?\d+)//) {
+	    # add missing n at start (backwards compatibility)
+	    $command =~ s/^(-?\d+)/n$1/;
+
+	    # nice value starts with n
+	    while ($command =~ s/n(-?\d+)//) {
 		$rule->{NICE} = $1;
 	    }
 
