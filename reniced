@@ -75,29 +75,67 @@ lines starting with a B<#> are ignored.
 Every line must consist of a command followed by a whitespace and a
 Perl regular expression.
 
-The command consists of a nice value, an io priority or both.  A nice
-value is given as a decimal, usually within the range of -20 to 19.
-An io priority consists of the scheduling class (B<r> for realtime,
-B<b> for best-effort and B<i> for idle) optionally followed by the
-class data (typically 0-7, lower being higher priority).
+The regular expression is matched against the L<ps(1)> output.  For
+every matched process the command is executed.
+
+A command generally takes the form of a character followed by a
+number.  Multiple commands can be given simultaneously with no spaces
+inbetween.  Sometimes the number is optional.  
+
+=head3 Command characters
+
+=over 5
+
+=item B<n>
+
+Sets the nice value of a process.  Must be followed by a number,
+usually within the range of -20 to 19.
+
+For backwards compatibility a B<n> at the beginning of the command can
+be left out (if the command starts with a number it is treated as a
+nice value).
+
+=item B<r>
+
+Sets the io priority to the realtime scheduling class.  The optional
+number is treated as class data (typically 0-7, lower being higher
+priority).
+
+=item B<b>
+
+Sets the io priority to the best-effort scheduling class.  The
+optional number is treated as class data (typically 0-7, lower being
+higher priority).
+
+=item B<i>
+
+Sets the io priority to the idle scheduling class.  No number needs to
+be given as the idle scheduling class ignores the class data value.
+
+=item B<o>
+
+Sets the OOM killer adjustment in C</proc/$PID/oom_adj> to the given
+number.
+
+=back
 
 =head3 Examples
 
 =over 5
 
-=item I<5 ^bash>
+=item C<5 ^bash>
 
 gives currently running bash shells a nice value of 5
 
-=item I<b2 ^tar> 
+=item C<b2 ^tar> 
 
-sets currently running to io priority best-effort within class 2
+sets currently running tar-processes to io priority best-effort within class 2
 
-=item I<i torrent>
+=item C<i torrent>
 
 sets currently running torrent-like applications to io priority idle
 
-=item I<-10r4 seti>
+=item C<n-10r4 seti>
 
 gives currently running seti-processes a nice value of -10 and sets
 them to realtime io priority in class 4
@@ -143,7 +181,7 @@ under the GNU GPL.
 
 =head1 AVAILABILITY
 
-Look for updates ad L<http://www.cgarbs.de/stuff.en.html>.
+Look for updates at L<http://www.cgarbs.de/stuff.en.html>.
 
 =head1 SEE ALSO
 
