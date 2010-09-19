@@ -243,7 +243,7 @@ Command format:
    o-10   set OOM value /proc/$PID/oom_adj to -10
 
 Version:
-   reniced 1.18+oom
+   reniced 1.19
 EOF
     ;
 }
