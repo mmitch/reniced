@@ -2,7 +2,7 @@
 #
 # reniced - renice running processes based on regular expressions
 #
-# Copyright (C) 2005,2007,2010  Christian Garbs <mitch@cgarbs.de>
+# Copyright (C) 2005,2007,2010,2012  Christian Garbs <mitch@cgarbs.de>
 # Licensed under GNU GPL.  See COPYING for details.
 
 use strict;
@@ -159,6 +159,18 @@ obtained from L<http://rlove.org/schedutils/>.
 You also need a suitable kernel and scheduler, e.g. Linux 2.6 with
 CFQ.
 
+=head1 LIMITATIONS
+
+The purpose of reniced is to renice long running server processes
+(hence the B<d> for daemon in it's name).
+
+Selecting and renicing processes it not atomic: The is a small gap
+between scanning the process list and renicing the processes.  If you
+target short-lived processes with your regular expressions, reniced
+might try to act on a process that is already gone.  In the worst case
+it might renice a new process that got the same process id as the
+already ended process that was matched.
+
 =head1 BUGS
 
 reniced can run without the BSD::Resource module.  In this case, the
@@ -176,7 +188,7 @@ reniced was written by Christian Garbs <F<mitch@cgarbs.de>>.
 
 =head1 COPYRIGHT
 
-reniced is Copyright (C) 2005,2007,2010 by Christian Garbs.  It is
+reniced is Copyright (C) 2005,2007,2010,2012 by Christian Garbs.  It is
 licensed under the GNU GPL.
 
 =head1 AVAILABILITY
