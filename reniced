@@ -474,9 +474,8 @@ sub renice_processes($$)
 		        }
 		    }
 		    if ($success) {
-			    print $score."\n";
-			    print PROC $score."\n";
-			    close PROC or $success = 0;
+			print PROC $score."\n";
+			close PROC or $success = 0;
 		    }
 		    debug '%sOOM adjust set to %d: %d/%s'
 			, $success ? '' : "FAILED ($!): ", $score, $proc->{PID}, $proc->{CMD};
