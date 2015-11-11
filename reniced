@@ -427,6 +427,21 @@ sub read_processes()
     return \@proc;
 }
 
+sub convert_oom_adj($)
+{
+    my $score = shift;
+    my $OOM_ADJUST_MAX = 15;
+    my $OOM_SCORE_ADJ_MAX = 1000;
+    my $OOM_DISABLE = -17;
+    if ($score == $OOM_ADJUST_MAX) {
+        $score = $OOM_SCORE_ADJ_MAX;
+    } else {
+        $score = int(($score * $OOM_SCORE_ADJ_MAX) / -$OOM_DISABLE);
+    }
+
+    return $score
+}
+
 sub renice_processes($$)
 # renice
 {
@@ -446,16 +461,25 @@ sub renice_processes($$)
 
 		# OOM adjust
 		if (exists $rule->{OOMADJ}) {
-		    my $procfile = '/proc/'.$proc->{PID}.'/oom_adj';
 		    my $success = 1;
-		    if ( open (PROC, '>', $procfile) ) {
-			print PROC $rule->{OOMADJ}."\n";
-			close PROC or $success = 0;
+		    my $score = $rule->{OOMADJ};
+
+		    my $procfile = '/proc/'.$proc->{PID}.'/oom_score_adj';
+		    if ( open (PROC, '>', $procfile)) {
+			$score = convert_oom_adj($score);
 		    } else {
-			$success = 0;
+			$procfile = '/proc/'.$proc->{PID}.'/oom_adj';
+		        if (! open (PROC, '>', $procfile) ) {
+			    $success = 0;
+		        }
+		    }
+		    if ($success) {
+			    print $score."\n";
+			    print PROC $score."\n";
+			    close PROC or $success = 0;
 		    }
 		    debug '%sOOM adjust set to %d: %d/%s'
-			, $success ? '' : "FAILED ($!): ", $rule->{OOMADJ}, $proc->{PID}, $proc->{CMD};
+			, $success ? '' : "FAILED ($!): ", $score, $proc->{PID}, $proc->{CMD};
 		}
 
 		# IO nice
