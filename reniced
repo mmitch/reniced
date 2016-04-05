@@ -115,7 +115,10 @@ be given as the idle scheduling class ignores the class data value.
 =item B<o>
 
 Sets the OOM killer adjustment in C</proc/$PID/oom_adj> to the given
-number.
+number.  (Internally, C</proc/$PID/oom_score_adj> will be used when
+available, but for backwards compatibility this value is still
+expected the in old C<oom_adj> format and will be converted
+automatically.)
 
 =back
 
