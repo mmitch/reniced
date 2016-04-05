@@ -1,6 +1,21 @@
 reniced HISTORY
 
 ----------------------------
+2016-04-05  revision 1.20
+
+ - support newer oom_score_adj kernel interface
+   (patch by Michal Hocko <mstsxfx@gmail.com>)
+   - fallback to old deprecated oom_adj interface if needed
+   - no configuration changes, existing oom_adj values are converted to
+     oom_score_adj as needed
+
+- don't print oom adjustment value to STDOUT
+
+- update manpage
+   - add LIMITATION section
+   - update project homepage
+
+----------------------------
 2010-09-19  revision 1.19
 
  - allow adjustment of OOM killer
