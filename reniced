@@ -167,7 +167,7 @@ CFQ.
 The purpose of reniced is to renice long running server processes
 (hence the B<d> for daemon in it's name).
 
-Selecting and renicing processes it not atomic: The is a small gap
+Selecting and renicing processes it not atomic: There is a small gap
 between scanning the process list and renicing the processes.  If you
 target short-lived processes with your regular expressions, reniced
 might try to act on a process that is already gone.  In the worst case
