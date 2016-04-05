@@ -340,7 +340,7 @@ sub read_rulefile()
     my $rulefile = find_rulefile();
     my @rule;
 
-    open RULES, "<$rulefile" or die "can't open `$rulefile': $!\n";
+    open RULES, '<', $rulefile or die "can't open `$rulefile': $!\n";
     while (my $line = <RULES>) {
 	chomp $line;
 	next if ($line =~ /^\s*$/);
@@ -414,7 +414,7 @@ sub read_processes()
     my @proc;
     my $cmdline = generate_ps_command();
 
-    open PS, "$cmdline|" or die "can't open `$cmdline': $!\n";
+    open PS, '-|', $cmdline or die "can't open `$cmdline': $!\n";
     {
 	my $line = <PS>; # skip first line
 	while ($line = <PS>) {
