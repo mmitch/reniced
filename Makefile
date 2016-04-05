@@ -14,11 +14,14 @@ FILES=$(BINARIES) $(CONFIG) $(DOCUMENTS)
 MANDIR=./manpages
 POD2MANOPTS=--release=$(VERSION) --center=$(PKGNAME) --section=1
 
-all:	dist
+all:	dist README.md
 
 clean:
 	rm -f *~
 	rm -rf $(MANDIR)
+
+README.md: reniced
+	pod2markdown reniced README.md
 
 generate-manpages:
 	rm -rf $(MANDIR)
