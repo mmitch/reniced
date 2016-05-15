@@ -1,6 +1,12 @@
 reniced HISTORY
 
 ----------------------------
+2016-05-15  revision 1.21
+
+ - clarify license: GNU GPL v2 or later
+ - add a README.md
+
+----------------------------
 2016-04-05  revision 1.20
 
  - support newer oom_score_adj kernel interface
