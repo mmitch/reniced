@@ -2,7 +2,7 @@
 #
 # reniced - renice running processes based on regular expressions
 #
-# Copyright (C) 2005,2007,2010,2012  Christian Garbs <mitch@cgarbs.de>
+# Copyright (C) 2005  Christian Garbs <mitch@cgarbs.de>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -204,7 +204,7 @@ reniced was written by Christian Garbs <F<mitch@cgarbs.de>>.
 
 =head1 COPYRIGHT
 
-reniced is Copyright (C) 2005,2007,2010,2012 by Christian Garbs.  It is
+reniced is Copyright (C) 2005 by Christian Garbs.  It is
 licensed under the GNU GPL v2 or later.
 
 =head1 AVAILABILITY

@@ -170,7 +170,7 @@ reniced was written by Christian Garbs <`mitch@cgarbs.de`>.
 
 # COPYRIGHT
 
-reniced is Copyright (C) 2005,2007,2010,2012 by Christian Garbs.  It is
+reniced is Copyright (C) 2005 by Christian Garbs.  It is
 licensed under the GNU GPL v2 or later.
 
 # AVAILABILITY
