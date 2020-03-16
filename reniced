@@ -204,7 +204,7 @@ reniced was written by Christian Garbs <F<mitch@cgarbs.de>>.
 
 =head1 COPYRIGHT
 
-reniced is Copyright (C) 2005 by Christian Garbs.  It is
+reniced is Copyright (C) 2005, 2020 by Christian Garbs.  It is
 licensed under the GNU GPL v2 or later.
 
 =head1 AVAILABILITY
@@ -228,6 +228,12 @@ my $rulefile_user = '~/.reniced';
 my $debug = 0;
 # default ps output format
 my $psformat = 'comm';
+# default actions
+my %actions = (
+    ADJUST_OOM  => \&adjust_oom,
+    SET_PRIO    => \&set_priority,
+    SET_IO_PRIO => \&set_io_priority,
+    );
 
 # are we root?
 my $root = $> == 0;
@@ -282,6 +288,53 @@ sub debug(@)
     return unless $debug;
     my $format = shift @_;
     printf "$format\n", @_;
+}
+
+sub adjust_oom($$$)
+# adjust OOM parameters for a pid
+{
+    my ($pid, $cmd, $score) = @_;
+    my $success = 1;
+    my $procfile = '/proc/'.$pid.'/oom_score_adj';
+    if ( open (PROC, '>', $procfile)) {
+	$score = convert_oom_adj($score);
+    } else {
+	$procfile = '/proc/'.$pid.'/oom_adj';
+	if (! open (PROC, '>', $procfile) ) {
+	    $success = 0;
+	}
+    }
+    if ($success) {
+	print PROC $score."\n";
+	close PROC or $success = 0;
+    }
+    debug '%sOOM adjust set to %d: %d/%s',
+	$success ? '' : "FAILED ($!): ", $score, $pid, $cmd;
+}
+
+sub set_priority($$$)
+# set priority (nice level) of a process
+{
+    my ($pid, $cmd, $nice) = @_;
+    my $success = setpriority $PRIO_PROCESS, $pid, $nice;
+    debug '%snice set to %d: %d/%s',
+	$success ? '' : 'FAILED: ', $nice, $pid, $cmd;
+}
+
+sub set_io_priority($$$$)
+# set IO priority and scheduling class of a process
+{
+    my ($pid, $cmd, $ioclass, $ionice) = @_ ;
+    my $schedclass = $SCHEDULING_CLASS{$ioclass};
+    if (defined $ionice) {
+	my $success = system 'ionice', '-c', $ioclass, '-p', $pid, '-n', $ionice;
+	debug '%sionice set to %s, class %d: %d/%s',
+	    $success ? 'FAILED: ' : '', $schedclass, $ionice, $pid, $cmd;
+    } else {
+	my $success = system 'ionice', '-c', $ioclass, '-p', $pid;
+	debug '%sionice set to %s: %d/%s',
+	    $success ? 'FAILED: ' : '', $schedclass, $pid, $cmd;
+    }
 }
 
 sub get_prio_process()
@@ -473,48 +526,17 @@ sub renice_processes($$)
 
 		# nice
 		if (exists $rule->{NICE}) {
-		    my $nice = $rule->{NICE};
-		    my $success = setpriority $PRIO_PROCESS, $pid, $nice;
-		    debug '%snice set to %d: %d/%s',
-			$success ? '' : 'FAILED: ', $nice, $pid, $cmd;
+		    $actions{SET_PRIO}->($pid, $cmd, $rule->{NICE});
 		}
 
 		# OOM adjust
 		if (exists $rule->{OOMADJ}) {
-		    my $success = 1;
-		    my $score = $rule->{OOMADJ};
-
-		    my $procfile = '/proc/'.$pid.'/oom_score_adj';
-		    if ( open (PROC, '>', $procfile)) {
-			$score = convert_oom_adj($score);
-		    } else {
-			$procfile = '/proc/'.$pid.'/oom_adj';
-		        if (! open (PROC, '>', $procfile) ) {
-			    $success = 0;
-		        }
-		    }
-		    if ($success) {
-			print PROC $score."\n";
-			close PROC or $success = 0;
-		    }
-		    debug '%sOOM adjust set to %d: %d/%s',
-			$success ? '' : "FAILED ($!): ", $score, $pid, $cmd;
+		    $actions{ADJUST_OOM}->($pid, $cmd, $rule->{OOMADJ});
 		}
 
 		# IO nice
 		if (exists $rule->{IOCLASS}) {
-		    my $ioclass = $rule->{IOCLASS};
-		    my $schedclass = $SCHEDULING_CLASS{$ioclass};
-		    if (exists $rule->{IONICE}) {
-			my $ionice = $rule->{IONICE};
-			my $success = system 'ionice', '-c', $ioclass, '-p', $pid, '-n', $ionice;
-			debug '%sionice set to %s, class %d: %d/%s',
-			    $success ? 'FAILED: ' : '', $schedclass, $ionice, $pid, $cmd;
-		    } else {
-			my $success = system 'ionice', '-c', $ioclass, '-p', $pid;
-			debug '%sionice set to %s: %d/%s',
-			    $success ? 'FAILED: ' : '', $schedclass, $pid, $cmd;
-		    }
+		    $actions{SET_IO_PRIO}->($pid, $cmd, $rule->{IOCLASS}, $rule->{IONICE});
 		}
 	    }
 	}
