@@ -355,10 +355,11 @@ sub get_prio_process()
 }
 
 sub parse_options()
-# check if "-v" is given
+# parse commandline arguments
 {
     while (@ARGV) {
-	if ($ARGV[0] eq '-o') {
+	my $arg = $ARGV[0];
+	if ($arg eq '-o') {
 	    shift @ARGV;
 	    if (@ARGV) {
 		$psformat = shift @ARGV;
@@ -367,12 +368,12 @@ sub parse_options()
 	    }
 	    next;
 	}
-	if ($ARGV[0] eq '-v') {
+	if ($arg eq '-v') {
 	    shift @ARGV;
 	    $debug = 1;
 	    next;
 	}
-	if ($ARGV[0] eq '-h') {
+	if ($arg eq '-h') {
 	    shift @ARGV;
 	    show_help();
 	    exit 0;
