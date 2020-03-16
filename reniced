@@ -466,14 +466,17 @@ sub renice_processes($$)
     my $procs = shift;
 
     foreach my $proc (@{$procs}) {
+	my $pid = $proc->{PID};
+	my $cmd = $proc->{CMD};
 	foreach my $rule (@{$rules}) {
-	    if ($proc->{CMD} =~ /$rule->{REGEXP}/) {
+	    if ($cmd =~ /$rule->{REGEXP}/) {
 
 		# nice
 		if (exists $rule->{NICE}) {
-		    my $success = setpriority $PRIO_PROCESS, $proc->{PID}, $rule->{NICE};
+		    my $nice = $rule->{NICE};
+		    my $success = setpriority $PRIO_PROCESS, $pid, $nice;
 		    debug '%snice set to %d: %d/%s'
-			, $success ? '' : 'FAILED: ', $rule->{NICE}, $proc->{PID}, $proc->{CMD};
+			, $success ? '' : 'FAILED: ', $nice, $pid, $cmd;
 		}
 
 		# OOM adjust
@@ -481,11 +484,11 @@ sub renice_processes($$)
 		    my $success = 1;
 		    my $score = $rule->{OOMADJ};
 
-		    my $procfile = '/proc/'.$proc->{PID}.'/oom_score_adj';
+		    my $procfile = '/proc/'.$pid.'/oom_score_adj';
 		    if ( open (PROC, '>', $procfile)) {
 			$score = convert_oom_adj($score);
 		    } else {
-			$procfile = '/proc/'.$proc->{PID}.'/oom_adj';
+			$procfile = '/proc/'.$pid.'/oom_adj';
 		        if (! open (PROC, '>', $procfile) ) {
 			    $success = 0;
 		        }
@@ -495,19 +498,22 @@ sub renice_processes($$)
 			close PROC or $success = 0;
 		    }
 		    debug '%sOOM adjust set to %d: %d/%s'
-			, $success ? '' : "FAILED ($!): ", $score, $proc->{PID}, $proc->{CMD};
+			, $success ? '' : "FAILED ($!): ", $score, $pid, $cmd;
 		}
 
 		# IO nice
 		if (exists $rule->{IOCLASS}) {
+		    my $ioclass = $rule->{IOCLASS};
+		    my $schedclass = $SCHEDULING_CLASS{$ioclass};
 		    if (exists $rule->{IONICE}) {
-			my $success = system 'ionice', '-c', $rule->{IOCLASS}, '-p', $proc->{PID}, '-n', $rule->{IONICE};
+			my $ionice = $rule->{IONICE};
+			my $success = system 'ionice', '-c', $ioclass, '-p', $pid, '-n', $ionice;
 			debug '%sionice set to %s, class %d: %d/%s'
-			    , $success ? 'FAILED: ' : '', $SCHEDULING_CLASS{$rule->{IOCLASS}}, $rule->{IONICE}, $proc->{PID}, $proc->{CMD};
+			    , $success ? 'FAILED: ' : '', $schedclass, $ionice, $pid, $cmd;
 		    } else {
-			my $success = system 'ionice', '-c', $rule->{IOCLASS}, '-p', $proc->{PID};
+			my $success = system 'ionice', '-c', $ioclass, '-p', $pid;
 			debug '%sionice set to %s: %d/%s'
-			    , $success ? 'FAILED: ' : '', $SCHEDULING_CLASS{$rule->{IOCLASS}}, $proc->{PID}, $proc->{CMD};
+			    , $success ? 'FAILED: ' : '', $schedclass, $pid, $cmd;
 		    }
 		}
 	    }
