@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# get current version number
+VERSION=$(grep 'reniced [0-9]' ../reniced | head -n 1 | sed -e 's/^\s*reniced\s*//' -e 's/\s*$$//')
+
+# replace version number with placeholder in output
+PATH=. ../reniced -h | sed "s/$VERSION/%%%VERSION%%%/"

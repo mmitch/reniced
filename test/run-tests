@@ -1,0 +1,52 @@
+#!/bin/bash
+
+set -e
+trap 'rm -f test-output diff-output' EXIT
+
+run_test()
+{
+    local test=$1
+
+    echo "running test $test"
+    "./$test.test" > test-output
+}
+
+check_result()
+{
+    local test=$1
+
+    if diff -Narup test-output "$test.expected" > diff-output; then
+	echo "OK"
+    else
+	echo "output differs:"
+	cat diff-output
+	status=1
+    fi
+}
+
+status=0
+
+for test in *.test; do
+
+    echo
+    if [ "$test" = '*.test' ]; then
+	echo "!! no tests found - wrong directory?"
+	echo "!! please run tests via 'make test'"
+	echo
+	exit 2
+    fi
+    
+    testbase=$(basename "$test" .test)
+    run_test "$testbase"
+    check_result "$testbase"
+done
+
+echo
+if [ $status = 0 ]; then
+    echo "all tests ok"
+else
+    echo "AT LEAST ONE TEST HAS FAILED"
+fi
+
+echo
+exit $status

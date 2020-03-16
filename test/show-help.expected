@@ -1,0 +1,26 @@
+Usage:
+   reniced [-h] [-v] [-o format] [configfile]
+
+Options:
+     -h           print help
+     -v           be verbose
+     -o format    output format to filter on
+                  see ps(1) manpage for details
+                  default: comm
+     configfile   read alternative configuration file
+                  default: /etc/reniced.conf for root
+                           ~/.reniced for others
+
+Configuration file format:
+   # is a comment
+   command perl_regular_expression
+
+Command format:
+   5      set nice value to 5
+   b2     set io priority to best effort class 2
+   i      set io priority to idle
+   -10r4  set nice value to -10 and io priority to realtime class 4
+   o-10   set OOM value /proc/$PID/oom_adj to -10
+
+Version:
+   reniced %%%VERSION%%%
