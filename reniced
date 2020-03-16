@@ -475,8 +475,8 @@ sub renice_processes($$)
 		if (exists $rule->{NICE}) {
 		    my $nice = $rule->{NICE};
 		    my $success = setpriority $PRIO_PROCESS, $pid, $nice;
-		    debug '%snice set to %d: %d/%s'
-			, $success ? '' : 'FAILED: ', $nice, $pid, $cmd;
+		    debug '%snice set to %d: %d/%s',
+			$success ? '' : 'FAILED: ', $nice, $pid, $cmd;
 		}
 
 		# OOM adjust
@@ -497,8 +497,8 @@ sub renice_processes($$)
 			print PROC $score."\n";
 			close PROC or $success = 0;
 		    }
-		    debug '%sOOM adjust set to %d: %d/%s'
-			, $success ? '' : "FAILED ($!): ", $score, $pid, $cmd;
+		    debug '%sOOM adjust set to %d: %d/%s',
+			$success ? '' : "FAILED ($!): ", $score, $pid, $cmd;
 		}
 
 		# IO nice
@@ -508,12 +508,12 @@ sub renice_processes($$)
 		    if (exists $rule->{IONICE}) {
 			my $ionice = $rule->{IONICE};
 			my $success = system 'ionice', '-c', $ioclass, '-p', $pid, '-n', $ionice;
-			debug '%sionice set to %s, class %d: %d/%s'
-			    , $success ? 'FAILED: ' : '', $schedclass, $ionice, $pid, $cmd;
+			debug '%sionice set to %s, class %d: %d/%s',
+			    $success ? 'FAILED: ' : '', $schedclass, $ionice, $pid, $cmd;
 		    } else {
 			my $success = system 'ionice', '-c', $ioclass, '-p', $pid;
-			debug '%sionice set to %s: %d/%s'
-			    , $success ? 'FAILED: ' : '', $schedclass, $pid, $cmd;
+			debug '%sionice set to %s: %d/%s',
+			    $success ? 'FAILED: ' : '', $schedclass, $pid, $cmd;
 		    }
 		}
 	    }
