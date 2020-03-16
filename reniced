@@ -61,6 +61,11 @@ When run as a user, renice only scans the user's processes (C<`ps H --user`>).
 This prints the version number, a short help text and exits without
 doing anything.
 
+=item B<-n>
+
+This activates no-op mode.  No actions are taken but everything that
+would be done is written to stdout.
+
 =item B<-v>
 
 This activates verbose mode.  Error messages, some statistics and all
@@ -257,6 +262,7 @@ Usage:
 
 Options:
      -h           print help
+     -n           only show what would be done
      -v           be verbose
      -o format    output format to filter on
                   see ps(1) manpage for details
@@ -312,6 +318,15 @@ sub adjust_oom($$$)
 	$success ? '' : "FAILED ($!): ", $score, $pid, $cmd;
 }
 
+sub adjust_oom_noop($$$)
+# NO-OP: adjust OOM parameters for a pid
+{
+    my ($pid, $cmd, $score) = @_;
+    print "would adjust OOM setting of pid $pid to $score\n";
+    debug 'OOM adjust set to %d: %d/%s',
+	$score, $pid, $cmd;
+}
+
 sub set_priority($$$)
 # set priority (nice level) of a process
 {
@@ -319,6 +334,15 @@ sub set_priority($$$)
     my $success = setpriority $PRIO_PROCESS, $pid, $nice;
     debug '%snice set to %d: %d/%s',
 	$success ? '' : 'FAILED: ', $nice, $pid, $cmd;
+}
+
+sub set_priority_noop($$$)
+# NO-OP: set priority (nice level) of a process
+{
+    my ($pid, $cmd, $nice) = @_;
+    print "would set priority of $pid to $nice\n";
+    debug 'nice set to %d: %d/%s',
+	$nice, $pid, $cmd;
 }
 
 sub set_io_priority($$$$)
@@ -334,6 +358,22 @@ sub set_io_priority($$$$)
 	my $success = system 'ionice', '-c', $ioclass, '-p', $pid;
 	debug '%sionice set to %s: %d/%s',
 	    $success ? 'FAILED: ' : '', $schedclass, $pid, $cmd;
+    }
+}
+
+sub set_io_priority_noop($$$$)
+# NO-OP: set IO priority and scheduling class of a process
+{
+    my ($pid, $cmd, $ioclass, $ionice) = @_ ;
+    my $schedclass = $SCHEDULING_CLASS{$ioclass};
+    if (defined $ionice) {
+	printf "would set IO priority for pid $pid to class $ioclass with nice $ionice\n";
+	debug 'ionice set to %s, class %d: %d/%s',
+	    $schedclass, $ionice, $pid, $cmd;
+    } else {
+	printf "would set IO priority for pid $pid to class $ioclass\n";
+	debug 'ionice set to %s: %d/%s',
+	    $schedclass, $pid, $cmd;
     }
 }
 
@@ -371,6 +411,15 @@ sub parse_options()
 	if ($arg eq '-v') {
 	    shift @ARGV;
 	    $debug = 1;
+	    next;
+	}
+	if ($arg eq '-n') {
+	    shift @ARGV;
+	    %actions = (
+		ADJUST_OOM  => \&adjust_oom_noop,
+		SET_PRIO    => \&set_priority_noop,
+		SET_IO_PRIO => \&set_io_priority_noop,
+		);
 	    next;
 	}
 	if ($arg eq '-h') {

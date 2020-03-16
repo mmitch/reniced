@@ -37,6 +37,11 @@ When run as a user, renice only scans the user's processes (`` `ps H --user` ``)
     This prints the version number, a short help text and exits without
     doing anything.
 
+- **-n**
+
+    This activates no-op mode.  No actions are taken but everything that
+    would be done is written to stdout.
+
 - **-v**
 
     This activates verbose mode.  Error messages, some statistics and all
@@ -170,7 +175,7 @@ reniced was written by Christian Garbs <`mitch@cgarbs.de`>.
 
 # COPYRIGHT
 
-reniced is Copyright (C) 2005 by Christian Garbs.  It is
+reniced is Copyright (C) 2005, 2020 by Christian Garbs.  It is
 licensed under the GNU GPL v2 or later.
 
 # AVAILABILITY
