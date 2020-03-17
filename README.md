@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/mmitch/reniced.svg?branch=master)](https://travis-ci.org/mmitch/reniced)
+[![GPL 2+](https://img.shields.io/badge/license-GPL%202%2B-blue.svg)](http://www.gnu.org/licenses/gpl-2.0-standalone.html)
+
 # NAME
 
 reniced - renice running processes based on regular expressions
