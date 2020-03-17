@@ -9,6 +9,7 @@ perl:
   - "5.22"
 
 install:
+  - true
 
 script:
   - make test
