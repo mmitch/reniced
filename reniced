@@ -387,11 +387,12 @@ sub set_io_priority_noop($$$$)
 sub get_prio_process()
 # get the numerical value for PRIO_PROCESS
 {
-    # Check for BSD::Resource which has the constant
+    # Check if BSD::Resource can be loaded
     eval { require BSD::Resource; };
+
     if (not $@) {
-	eval { use BSD::Resource qw(PRIO_PROCESS); };
-	$PRIO_PROCESS = PRIO_PROCESS;
+	# BSD::Resource which has the constant is available
+	eval "$PRIO_PROCESS = BSD::Resource::PRIO_PROCESS;";
 	debug 'PRIO_PROCESS set to %d via BSD::Resource', $PRIO_PROCESS;
     } else {
 	# dirty fallback, works for my Linux 2.6.11 i686 GNU/Linux
