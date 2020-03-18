@@ -3,6 +3,7 @@ Usage:
 
 Options:
      -h           print help
+     -n           only show what would be done
      -v           be verbose
      -o format    output format to filter on
                   see ps(1) manpage for details
