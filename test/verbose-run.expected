@@ -1,7 +1,7 @@
 PRIO_PROCESS to 0 via fallback
 rulefile: test.conf
 3 rules read
-ps commandline is: ps H -o lwp,comm --user 1000
+ps commandline is: ps H -o lwp,comm --user %%%USERID%%%
 5 processes read
 would set priority of 201 to 5
 nice set to 5: 201/foo --quick
