@@ -1,0 +1,15 @@
+PRIO_PROCESS to 0 via fallback
+rulefile: test.conf
+3 rules read
+ps commandline is: ps H -o lwp,comm --user 1000
+5 processes read
+would set priority of 201 to 5
+nice set to 5: 201/foo --quick
+would set priority of 2445 to 5
+nice set to 5: 2445/foo --slow
+would set IO priority for pid 19966 to class 3
+ionice set to idle: 19966/bar
+would set priority of 1234567 to 3
+nice set to 3: 1234567/long-pid
+would adjust OOM setting of pid 1234567 to -10
+OOM adjust set to -10: 1234567/long-pid

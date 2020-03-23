@@ -8,13 +8,19 @@ run_test()
     local test=$1
 
     echo "running test $test"
-    "./$test.test" > test-output
+    if "./$test.test" > test-output; then
+	echo "OK"
+    else
+	status=1
+	echo "command returned failure"
+    fi
 }
 
 check_result()
 {
     local test=$1
 
+    echo "checking output"
     if diff -Narup test-output "$test.expected" > diff-output; then
 	echo "OK"
     else

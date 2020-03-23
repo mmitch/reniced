@@ -1,0 +1,19 @@
+#!/bin/bash
+# mocked ps command
+
+printf -v argstring ':%s' "$@"
+
+case "$argstring" in
+    :H:-o:lwp,comm:--user:$UID)
+	echo '     LWP COMMAND'
+	echo '     201 foo --quick'
+	echo '    2445 foo --slow'
+	echo '   19966 bar'
+	echo '   30176 bar --really --slow'
+	echo ' 1234567 long-pid'
+	;;
+    *)
+	echo "ps called with unexpected parameters: ps$argstring"
+	exit 1
+	;;
+esac

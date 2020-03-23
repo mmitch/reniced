@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# mock ps output
+PATH=".:${PATH+:}${PATH}"
+export PATH
+
+# run test in no-op mode
+../reniced -n test.conf
