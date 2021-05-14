@@ -392,7 +392,7 @@ sub get_prio_process()
 
     if (not $@) {
 	# BSD::Resource which has the constant is available
-	eval "$PRIO_PROCESS = BSD::Resource::PRIO_PROCESS;";
+	$PRIO_PROCESS = eval 'use BSD::Resource qw(PRIO_PROCESS); return BSD::Resource::PRIO_PROCESS';
 	debug 'PRIO_PROCESS set to %d via BSD::Resource', $PRIO_PROCESS;
     } else {
 	# dirty fallback, works for my Linux 2.6.11 i686 GNU/Linux
