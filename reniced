@@ -399,7 +399,7 @@ sub get_prio_process()
 	# dirty fallback, works for my Linux 2.6.11 i686 GNU/Linux
 	# see setpriority(2) and /usr/include/bits/resource.h
 	$PRIO_PROCESS = 0;
-	debug 'PRIO_PROCESS to %d via fallback', $PRIO_PROCESS;
+	debug 'PRIO_PROCESS set to %d via fallback', $PRIO_PROCESS;
     }
 }
 
