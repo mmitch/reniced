@@ -5,5 +5,14 @@ set -e -o pipefail
 PATH=".:${PATH+:}${PATH}"
 export PATH
 
+# check if BSD::Resource is available
+if perl -MBSD::Resource -e 1 2>/dev/null; then
+    echo testing with BSD::Resource available >&2
+    PRIO_PROCESS_SOURCE=BSD::Resource
+else
+    echo testing without BSD::Resource >&2
+    PRIO_PROCESS_SOURCE=fallback
+fi
+
 # run test in no-op mode replacing placeholder with user id in output
-../reniced -n -v test.conf 2>&1 | sed "s/${UID}/%%%USERID%%%/"
+../reniced -n -v test.conf 2>&1 | sed -e "s/${UID}/%%%USERID%%%/" -e "s/${PRIO_PROCESS_SOURCE}/%%%PRIO_PROCESS_SOURCE%%%/"

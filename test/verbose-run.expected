@@ -1,4 +1,4 @@
-PRIO_PROCESS to 0 via fallback
+PRIO_PROCESS set to 0 via %%%PRIO_PROCESS_SOURCE%%%
 rulefile: test.conf
 3 rules read
 ps commandline is: ps H -o lwp,comm --user %%%USERID%%%
