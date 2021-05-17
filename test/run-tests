@@ -1,14 +1,14 @@
 #!/bin/bash
 
 set -e
-trap 'rm -f test-output diff-output' EXIT
+trap 'rm -f test-output.actual diff-output' EXIT
 
 run_test()
 {
     local test=$1
 
     echo "running test $test"
-    if "./$test.test" > test-output; then
+    if "./$test.test" > test-output.actual; then
 	echo "OK"
     else
 	status=1
@@ -21,7 +21,7 @@ check_result()
     local test=$1
 
     echo "checking output"
-    if diff -Narup test-output "$test.expected" > diff-output; then
+    if diff -Narup "$test.expected" test-output.actual > diff-output; then
 	echo "OK"
     else
 	echo "output differs:"
