@@ -1,4 +1,5 @@
-#!/bin/sh
+#!/bin/bash
+set -e -o pipefail
 
 # get current version number
 VERSION=$(grep 'reniced [0-9]' ../reniced | head -n 1 | sed -e 's/^\s*reniced\s*//' -e 's/\s*$$//')

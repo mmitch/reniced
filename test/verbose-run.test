@@ -1,11 +1,9 @@
-#!/bin/sh
+#!/bin/bash
+set -e -o pipefail
 
 # mock ps output
 PATH=".:${PATH+:}${PATH}"
 export PATH
-
-# get current user id
-UID=`id -u`
 
 # run test in no-op mode replacing placeholder with user id in output
 ../reniced -n -v test.conf  | sed "s/${UID}/%%%USERID%%%/"
