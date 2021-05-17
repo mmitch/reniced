@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/mmitch/reniced.svg?branch=master)](https://travis-ci.org/mmitch/reniced)
+[![Linux Test](https://github.com/mmitch/reniced/actions/workflows/test_linux.yml/badge.svg)](https://github.com/mmitch/reniced/actions/workflows/test_linux.yml)
 [![GPL 2+](https://img.shields.io/badge/license-GPL%202%2B-blue.svg)](http://www.gnu.org/licenses/gpl-2.0-standalone.html)
 
 # NAME

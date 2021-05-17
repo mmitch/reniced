@@ -1,0 +1,31 @@
+name: Linux Test
+
+on:
+  push:
+  pull_request:
+    types: [opened]
+  schedule:
+    - cron: '43 2 1 * *'
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        perl: ['5.32', '5.30', '5.28', '5.22']
+        install: ['', 'BSD::Resource']
+    name: Test with Perl ${{ matrix.perl }} + ${{ matrix.install }} on Linux
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up perl
+        uses: shogo82148/actions-setup-perl@v1
+        with:
+          perl-version: ${{ matrix.perl }}
+          install-modules-with: cpanm
+          install-modules: ${{ matrix.install }}
+          # the cache can sometimes move the installed module
+          # over to the version that should not have it,
+          # so disable it
+          enable-modules-cache: false
+      - run: make test
