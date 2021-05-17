@@ -5,4 +5,4 @@ set -e -o pipefail
 VERSION=$(grep 'reniced [0-9]' ../reniced | head -n 1 | sed -e 's/^\s*reniced\s*//' -e 's/\s*$$//')
 
 # replace version number with placeholder in output
-../reniced -h | sed "s/$VERSION/%%%VERSION%%%/"
+../reniced -h 2>&1 | sed "s/$VERSION/%%%VERSION%%%/"

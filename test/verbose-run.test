@@ -6,4 +6,4 @@ PATH=".:${PATH+:}${PATH}"
 export PATH
 
 # run test in no-op mode replacing placeholder with user id in output
-../reniced -n -v test.conf  | sed "s/${UID}/%%%USERID%%%/"
+../reniced -n -v test.conf 2>&1 | sed "s/${UID}/%%%USERID%%%/"
