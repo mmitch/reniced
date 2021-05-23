@@ -1,7 +1,7 @@
 reniced HISTORY
 
 ----------------------------
-2021-06-17  revision 1.23
+2021-05-23  revision 1.23
 
  - fix error when using BSD::Resource
 
